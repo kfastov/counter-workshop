@@ -7,7 +7,7 @@ pub trait ICounter<TState> {
 #[starknet::contract]
 pub mod counter_contract {
     use OwnableComponent::InternalTrait;
-use starknet::event::EventEmitter;
+    use starknet::event::EventEmitter;
     use starknet::ContractAddress;
     use super::ICounter;
     use openzeppelin::access::ownable::OwnableComponent;
@@ -19,7 +19,7 @@ use starknet::event::EventEmitter;
     impl OwnableImpl = OwnableComponent::OwnableImpl<ContractState>;
 
     #[storage]
-    struct Storage{
+    struct Storage {
         counter: u32,
         kill_switch: ContractAddress,
         #[substorage(v0)]
@@ -27,7 +27,12 @@ use starknet::event::EventEmitter;
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, initial_value: u32, kill_switch: ContractAddress, initial_owner: ContractAddress) {
+    fn constructor(
+        ref self: ContractState,
+        initial_value: u32,
+        kill_switch: ContractAddress,
+        initial_owner: ContractAddress
+    ) {
         self.counter.write(initial_value);
         self.kill_switch.write(kill_switch);
         self.ownable.initializer(initial_owner);
@@ -54,9 +59,7 @@ use starknet::event::EventEmitter;
         fn increase_counter(ref self: ContractState) {
             self.ownable.assert_only_owner();
 
-            let kill_switch = IKillSwitchDispatcher {
-                contract_address: self.kill_switch.read(),
-            };
+            let kill_switch = IKillSwitchDispatcher { contract_address: self.kill_switch.read(), };
 
             assert!(!kill_switch.is_active(), "Kill Switch is active");
 
